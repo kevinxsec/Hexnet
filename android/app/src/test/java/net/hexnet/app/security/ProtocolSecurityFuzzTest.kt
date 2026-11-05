@@ -123,7 +123,7 @@ class ProtocolSecurityFuzzTest {
     @Test
     fun testBoundaryPayloadLengths() {
         // 0-byte payload (empty payload boundary)
-        val emptyPacket = BinaryPacket(type = PacketType.DISCOVERY_BEACON, sourceHex = 1L, destinationHex = 2L, payload = ByteArray(0))
+        val emptyPacket = BinaryPacket(type = PacketType.PEER_ANNOUNCE, sourceHex = 1L, destinationHex = 2L, payload = ByteArray(0))
         val emptySerialized = PacketSerializer.serialize(emptyPacket)
         assertEquals(BinaryPacket.TOTAL_FRAMING_OVERHEAD, emptySerialized.size) // Exactly 44 bytes
         assertTrue(PacketSerializer.deserialize(emptySerialized).isSuccess)

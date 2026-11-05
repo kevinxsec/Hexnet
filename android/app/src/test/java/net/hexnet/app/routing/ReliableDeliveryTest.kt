@@ -3,6 +3,7 @@ package net.hexnet.app.routing
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import net.hexnet.app.core.crypto.IdentityManager
 import net.hexnet.app.core.crypto.KeyPairBytes
 import net.hexnet.app.core.crypto.NoiseSessionManager
 import net.hexnet.app.core.database.dao.OutboundQueueDao
@@ -235,12 +236,11 @@ class ReliableDeliveryTest {
 
     @Test
     fun testAuthenticatedEndToEndAckDeliveryVerification() = runBlocking {
-        // Setup two nodes with mutual Noise sessions
-        val aliceStatic = KeyPairBytes(ByteArray(32) { 0x01 }, ByteArray(32) { 0x02 })
-        val bobStatic = KeyPairBytes(ByteArray(32) { 0x03 }, ByteArray(32) { 0x04 })
+        val aliceIdMgr = IdentityManager().apply { getOrCreateIdentity("alice", "Alice") }
+        val bobIdMgr = IdentityManager().apply { getOrCreateIdentity("bob", "Bob") }
 
-        val aliceSm = NoiseSessionManager(aliceStatic)
-        val bobSm = NoiseSessionManager(bobStatic)
+        val aliceSm = NoiseSessionManager(aliceIdMgr)
+        val bobSm = NoiseSessionManager(bobIdMgr)
 
         // Establish Noise Session between Alice (0x01) and Bob (0x02)
         val msg1 = aliceSm.startHandshake("2")
@@ -275,6 +275,7 @@ class ReliableDeliveryTest {
         assertTrue(decision is RoutingDecision.AcceptLocally)
         assertEquals("Secure Hello", String((decision as RoutingDecision.AcceptLocally).decryptedPayload!!))
 
+        bobEngine.sendEndToEndAck(destinationHex = 0x01L, originalPacketId = 7777L)
         assertNotNull(ackFromBob)
         // Verify that Bob's E2E ACK is authenticated with ENCRYPTED flag
         assertTrue(PacketFlags.hasFlag(ackFromBob!!.flags, PacketFlags.ENCRYPTED))
@@ -293,11 +294,11 @@ class ReliableDeliveryTest {
 
     @Test
     fun testUnauthenticatedAckSpoofingRejected() = runBlocking {
-        // Alice expects an encrypted direct message confirmation from Bob
-        val aliceStatic = KeyPairBytes(ByteArray(32) { 0x01 }, ByteArray(32) { 0x02 })
-        val aliceSm = NoiseSessionManager(aliceStatic)
-        val bobStatic = KeyPairBytes(ByteArray(32) { 0x03 }, ByteArray(32) { 0x04 })
-        val bobSm = NoiseSessionManager(bobStatic)
+        val aliceIdMgr = IdentityManager().apply { getOrCreateIdentity("alice", "Alice") }
+        val bobIdMgr = IdentityManager().apply { getOrCreateIdentity("bob", "Bob") }
+
+        val aliceSm = NoiseSessionManager(aliceIdMgr)
+        val bobSm = NoiseSessionManager(bobIdMgr)
 
         // Handshake
         val msg1 = aliceSm.startHandshake("2")

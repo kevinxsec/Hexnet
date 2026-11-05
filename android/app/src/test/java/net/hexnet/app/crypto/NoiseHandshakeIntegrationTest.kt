@@ -17,20 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class NoiseHandshakeIntegrationTest {
 
-    // In-memory key storage for testing
-    private class InMemoryKeyStorage : KeyStorage {
-        val storage = mutableMapOf<String, ByteArray>()
-        override fun storeKey(alias: String, keyBytes: ByteArray) { storage[alias] = keyBytes }
-        override fun getKey(alias: String): ByteArray? = storage[alias]
-        override fun hasKey(alias: String): Boolean = storage.containsKey(alias)
-        override fun removeKey(alias: String) { storage.remove(alias) }
-        override fun clearAll() { storage.clear() }
-    }
-
     private fun createTestIdentityManager(username: String): IdentityManager {
         val storage = InMemoryKeyStorage()
         val manager = IdentityManager(storage)
-        manager.generateIdentity(username)
+        manager.getOrCreateIdentity(username, username)
         return manager
     }
 

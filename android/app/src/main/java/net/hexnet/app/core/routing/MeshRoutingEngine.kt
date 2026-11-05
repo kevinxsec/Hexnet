@@ -392,20 +392,27 @@ class MeshRoutingEngine(
      */
     fun initiateNoiseHandshake(destinationHex: Long): BinaryPacket? {
         val sm = sessionManager ?: return null
+        if (destinationHex == BinaryPacket.BROADCAST_DESTINATION) return null
         val peerHexStr = java.lang.Long.toHexString(destinationHex)
-        val msg1 = sm.startHandshake(peerHexStr)
-        val packet = BinaryPacket(
-            type = PacketType.NOISE_HANDSHAKE,
-            flags = PacketFlags.NONE,
-            ttl = BinaryPacket.DEFAULT_TTL,
-            hopCount = 0,
-            packetId = kotlin.random.Random.nextLong(),
-            sourceHex = localHexAddress,
-            destinationHex = destinationHex,
-            payload = msg1
-        )
-        dispatchPacket(packet)
-        return packet
+        if (sm.hasActiveSession(peerHexStr)) return null
+
+        return try {
+            val msg1 = sm.startHandshake(peerHexStr)
+            val packet = BinaryPacket(
+                type = PacketType.NOISE_HANDSHAKE,
+                flags = PacketFlags.NONE,
+                ttl = BinaryPacket.DEFAULT_TTL,
+                hopCount = 0,
+                packetId = kotlin.random.Random.nextLong(),
+                sourceHex = localHexAddress,
+                destinationHex = destinationHex,
+                payload = msg1
+            )
+            dispatchPacket(packet)
+            packet
+        } catch (e: Exception) {
+            null
+        }
     }
 
     /**
@@ -442,6 +449,16 @@ class MeshRoutingEngine(
         }
         if (inMem != null) {
             inMemoryOutboundQueue[ack.originalPacketId] = inMem.copy(state = "DELIVERED")
+        } else {
+            inMemoryOutboundQueue[ack.originalPacketId] = OutboundPacketEntity(
+                packetId = ack.originalPacketId,
+                destinationHex = ack.ackSenderHex,
+                packetType = PacketType.DIRECT_MESSAGE.code,
+                rawPacketBytes = ByteArray(0),
+                nextRetryEpochMs = 0L,
+                createdAtEpochMs = System.currentTimeMillis(),
+                state = "DELIVERED"
+            )
         }
 
         val listener = pendingE2eAckListeners.remove(ack.originalPacketId)
@@ -477,6 +494,18 @@ class MeshRoutingEngine(
                 // No active session: queue the message and automatically initiate Noise XX handshake
                 val pending = PendingDirectMessage(destinationHex, plaintext, packetId)
                 pendingSecureMessages.computeIfAbsent(destinationHex) { java.util.concurrent.CopyOnWriteArrayList() }.add(pending)
+                val entity = OutboundPacketEntity(
+                    packetId = packetId,
+                    destinationHex = destinationHex,
+                    packetType = PacketType.DIRECT_MESSAGE.code,
+                    rawPacketBytes = plaintext,
+                    retryCount = 0,
+                    maxRetries = 3,
+                    nextRetryEpochMs = System.currentTimeMillis() + BASE_RETRY_BACKOFF_MS,
+                    createdAtEpochMs = System.currentTimeMillis(),
+                    state = "QUEUED"
+                )
+                inMemoryOutboundQueue[packetId] = entity
                 onDeliveryStateChanged?.invoke(packetId, "QUEUED")
                 initiateNoiseHandshake(destinationHex)
 
@@ -533,8 +562,10 @@ class MeshRoutingEngine(
 
         onDeliveryStateChanged?.invoke(packet.packetId, "SENDING")
 
-        // Dispatch with hop-by-hop retry
-        dispatchWithRetry(packet, maxRetries = 3)
+        // Dispatch with hop-by-hop retry in background
+        scope.launch {
+            dispatchWithRetry(packet, maxRetries = 3)
+        }
 
         return packet
     }
@@ -591,31 +622,6 @@ class MeshRoutingEngine(
         }
     }
 
-    /**
-     * Initiates a Noise_XX handshake with the remote peer over BLE mesh transport.
-     */
-    fun initiateNoiseHandshake(destinationHex: Long) {
-        if (sessionManager == null || destinationHex == BinaryPacket.BROADCAST_DESTINATION) return
-        val peerHexStr = java.lang.Long.toHexString(destinationHex)
-        if (sessionManager.hasActiveSession(peerHexStr)) return
-
-        try {
-            val msg1Bytes = sessionManager.startHandshake(peerHexStr)
-            val handshakePacket = BinaryPacket(
-                type = PacketType.NOISE_HANDSHAKE,
-                flags = PacketFlags.NONE,
-                ttl = BinaryPacket.DEFAULT_TTL,
-                hopCount = 0,
-                packetId = kotlin.random.Random.nextLong(),
-                sourceHex = localHexAddress,
-                destinationHex = destinationHex,
-                payload = msg1Bytes
-            )
-            dispatchPacket(handshakePacket)
-        } catch (e: Exception) {
-            // Handshake initiation handled safely
-        }
-    }
 
     /**
      * Resumes and encrypts all direct messages queued while awaiting session establishment.

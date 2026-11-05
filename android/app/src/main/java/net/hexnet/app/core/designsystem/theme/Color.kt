@@ -1,71 +1,63 @@
 package net.hexnet.app.core.designsystem.theme
 
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-// Monochromatic Foundation - Dark Mode (Graphite / Carbon)
-val HexBackgroundDark = Color(0xFF0B0C10)
-val HexSurfaceDark = Color(0xFF13141C)
-val HexSurfaceSubtleDark = Color(0xFF1A1C26)
-val HexBorderDark = Color(0xFF262838)
-val HexBorderSubtleDark = Color(0xFF1C1E2A)
+// Pure AMOLED Black Canvas (#000000)
+val HexBackgroundDark = Color(0xFF000000)
+val HexSurfaceDark = Color(0xFF09090B)           // Obsidian Tier 1
+val HexSurfaceSubtleDark = Color(0xFF101014)     // Obsidian Tier 2
+val HexSurfaceElevatedDark = Color(0xFF17171D)   // Obsidian Tier 3
 
-// Restrained Cobalt Accent (Signal/Linear-inspired)
-val HexAccentPrimary = Color(0xFF3B82F6)
-val HexAccentHover = Color(0xFF2563EB)
-val HexAccentSubtle = Color(0xFF1E3A8A)
+// Hairline & Subtle Borders
+val HexBorderDark = Color(0x1FFFFFFF)           // 12% white hairline
+val HexBorderSubtleDark = Color(0x0FFFFFFF)     // 6% white divider
 
-// Status & Semantic Colors (Quiet & Precise)
-val HexSuccessDirect = Color(0xFF10B981)
-val HexWarningRelay = Color(0xFFF59E0B)
-val HexErrorAlert = Color(0xFFEF4444)
+// Tactical & Expressive Accents (Approved Palette)
+val HexPeriwinkle = Color(0xFF8795FF)           // Electric Periwinkle (Primary)
+val HexViolet = Color(0xFF997BFA)               // Violet (E2EE / Noise)
+val HexLavender = Color(0xFFB9A7FF)             // Soft Lavender (Pill highlights)
+val HexIceBlue = Color(0xFF9ADCF5)              // Ice Blue (Telemetry / Nearby)
+val HexMint = Color(0xFF91D9BD)                 // Mint (Delivered / Connected)
+val HexCoral = Color(0xFFF2A69D)                // Coral (Alert / Error)
 
-// Neutral Text Hierarchy - Dark Mode
-val HexTextPrimaryDark = Color(0xFFF4F4F5)
-val HexTextSecondaryDark = Color(0xFF9CA3AF)
+// Backward Compatibility Aliases
+val HexAccentPrimary = HexPeriwinkle
+val HexAccentHover = Color(0xFFA1ACFF)
+val HexAccentSubtle = Color(0x338795FF)
+val HexCyanPrimary = HexPeriwinkle
+val HexCyanContainer = Color(0x268795FF)
+val HexSuccessDirect = HexMint
+val HexWarningRelay = HexLavender
+val HexErrorAlert = HexCoral
+
+// Liquid Glass Translucent Surfaces
+val HexGlassFill = Color(0x0EFFFFFF)            // 5.5% translucent fill
+val HexGlassBorder = Color(0x1FFFFFFF)          // 12% border
+val HexGlassHighlight = Color(0x38FFFFFF)       // 22% specular rim
+
+// Text Hierarchy — Pure Dark Mode Only
+val HexTextPrimaryDark = Color(0xFFF5F5F7)
+val HexTextSecondaryDark = Color(0xFFA1A1AA)
 val HexTextMutedDark = Color(0xFF6B7280)
 
-// Monochromatic Foundation - Light Mode
-val HexBackgroundLight = Color(0xFFF8F9FA)
-val HexSurfaceLight = Color(0xFFFFFFFF)
-val HexSurfaceSubtleLight = Color(0xFFF1F3F5)
-val HexBorderLight = Color(0xFFE5E7EB)
-val HexTextPrimaryLight = Color(0xFF111827)
-val HexTextSecondaryLight = Color(0xFF4B5563)
-val HexTextMutedLight = Color(0xFF9CA3AF)
-
 val HexnetDarkColorScheme = darkColorScheme(
-    primary = HexAccentPrimary,
-    onPrimary = Color.White,
+    primary = HexPeriwinkle,
+    onPrimary = Color(0xFF09090B),
     primaryContainer = HexAccentSubtle,
-    onPrimaryContainer = Color(0xFFDBEAFE),
-    secondary = HexWarningRelay,
-    onSecondary = Color.Black,
-    tertiary = HexSuccessDirect,
+    onPrimaryContainer = Color(0xFFDFE0FF),
+    secondary = HexViolet,
+    onSecondary = Color(0xFF09090B),
+    secondaryContainer = Color(0x33997BFA),
+    onSecondaryContainer = HexLavender,
+    tertiary = HexIceBlue,
     background = HexBackgroundDark,
     onBackground = HexTextPrimaryDark,
-    surface = HexSurfaceDark,
+    surface = HexBackgroundDark,
     onSurface = HexTextPrimaryDark,
     surfaceVariant = HexSurfaceSubtleDark,
     onSurfaceVariant = HexTextSecondaryDark,
     outline = HexBorderDark
 )
 
-val HexnetLightColorScheme = lightColorScheme(
-    primary = HexAccentHover,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFDBEAFE),
-    onPrimaryContainer = Color(0xFF1E3A8A),
-    secondary = Color(0xFFD97706),
-    onSecondary = Color.White,
-    tertiary = Color(0xFF059669),
-    background = HexBackgroundLight,
-    onBackground = HexTextPrimaryLight,
-    surface = HexSurfaceLight,
-    onSurface = HexTextPrimaryLight,
-    surfaceVariant = HexSurfaceSubtleLight,
-    onSurfaceVariant = HexTextSecondaryLight,
-    outline = HexBorderLight
-)
-
+val HexnetLightColorScheme = HexnetDarkColorScheme // Strict AMOLED Dark Mode only

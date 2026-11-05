@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,14 +23,14 @@ import net.hexnet.app.core.designsystem.theme.*
 import net.hexnet.app.core.model.MessageDeliveryState
 
 /**
- * Minimalist, restrained avatar with clean circular geometry and subtle verification marker.
+ * Minimalist, premium avatar with clean circular geometry and subtle status dot.
  */
 @Composable
 fun HexAvatar(
     name: String,
     hexAddress: String,
     modifier: Modifier = Modifier,
-    size: Int = 44,
+    size: Int = 46,
     isDirect: Boolean = false,
     isVerified: Boolean = false
 ) {
@@ -45,54 +44,54 @@ fun HexAvatar(
             .size(size.dp)
             .clip(CircleShape)
             .background(HexSurfaceSubtleDark)
-            .border(0.5.dp, HexBorderDark, CircleShape),
+            .border(1.dp, HexBorderDark, CircleShape),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = initials,
             color = HexTextPrimaryDark,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             fontSize = (size * 0.36).sp,
-            fontFamily = FontFamily.SansSerif
+            fontFamily = HexnetFontFamily
         )
 
-        // Restrained status indicator
+        // Minimal subtle indicator
         if (isVerified) {
             Box(
                 modifier = Modifier
-                    .size((size * 0.3).dp)
+                    .size((size * 0.28).dp)
                     .align(Alignment.BottomEnd)
                     .clip(CircleShape)
                     .background(HexBackgroundDark)
-                    .padding(1.dp)
+                    .padding(1.5.dp)
                     .clip(CircleShape)
-                    .background(HexSuccessDirect),
+                    .background(HexViolet),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Check,
                     contentDescription = "Verified",
                     tint = Color.White,
-                    modifier = Modifier.size((size * 0.2).dp)
+                    modifier = Modifier.size((size * 0.18).dp)
                 )
             }
         } else if (isDirect) {
             Box(
                 modifier = Modifier
-                    .size((size * 0.24).dp)
+                    .size((size * 0.22).dp)
                     .align(Alignment.BottomEnd)
                     .clip(CircleShape)
                     .background(HexBackgroundDark)
-                    .padding(1.dp)
+                    .padding(1.5.dp)
                     .clip(CircleShape)
-                    .background(HexAccentPrimary)
+                    .background(HexMint)
             )
         }
     }
 }
 
 /**
- * Minimalist, unobtrusive delivery status indicators (Signal/Linear-inspired).
+ * Unobtrusive, elegant delivery status indicators.
  */
 @Composable
 fun DeliveryStatusIcon(
@@ -103,7 +102,7 @@ fun DeliveryStatusIcon(
         MessageDeliveryState.PENDING, MessageDeliveryState.QUEUED -> {
             Icon(
                 imageVector = Icons.Default.Schedule,
-                contentDescription = "Queued in outbound buffer",
+                contentDescription = "Queued",
                 tint = HexTextMutedDark,
                 modifier = modifier.size(12.dp)
             )
@@ -111,15 +110,15 @@ fun DeliveryStatusIcon(
         MessageDeliveryState.SENDING -> {
             Icon(
                 imageVector = Icons.Default.ArrowUpward,
-                contentDescription = "Transmitting to mesh",
-                tint = HexAccentPrimary,
+                contentDescription = "Transmitting",
+                tint = HexPeriwinkle,
                 modifier = modifier.size(12.dp)
             )
         }
-        MessageDeliveryState.RELAYED, MessageDeliveryState.SENT -> {
+        MessageDeliveryState.RELAYED -> {
             Icon(
                 imageVector = Icons.Default.Check,
-                contentDescription = "Sent & relayed by mesh node",
+                contentDescription = "Sent",
                 tint = HexTextSecondaryDark,
                 modifier = modifier.size(12.dp)
             )
@@ -127,16 +126,16 @@ fun DeliveryStatusIcon(
         MessageDeliveryState.DELIVERED -> {
             Icon(
                 imageVector = Icons.Default.DoneAll,
-                contentDescription = "Delivered & verified by recipient",
-                tint = HexAccentPrimary,
+                contentDescription = "Delivered",
+                tint = HexPeriwinkle,
                 modifier = modifier.size(13.dp)
             )
         }
         MessageDeliveryState.FAILED -> {
             Icon(
                 imageVector = Icons.Default.ErrorOutline,
-                contentDescription = "Delivery failed · Tap to retry",
-                tint = HexErrorAlert,
+                contentDescription = "Failed",
+                tint = HexCoral,
                 modifier = modifier.size(12.dp)
             )
         }
@@ -144,131 +143,80 @@ fun DeliveryStatusIcon(
 }
 
 /**
- * Restrained signal strength indicator with compact dBm reading.
- */
-@Composable
-fun SignalMeter(
-    rssiDbm: Int,
-    isDirect: Boolean = true,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
-        verticalAlignment = Alignment.Bottom
-    ) {
-        val bars = when {
-            rssiDbm >= -65 -> 4
-            rssiDbm >= -75 -> 3
-            rssiDbm >= -85 -> 2
-            else -> 1
-        }
-        val activeColor = if (isDirect) HexSuccessDirect else HexWarningRelay
-
-        for (i in 1..4) {
-            val height = (i * 2.5 + 3).dp
-            Box(
-                modifier = Modifier
-                    .width(2.5.dp)
-                    .height(height)
-                    .clip(RoundedCornerShape(0.5.dp))
-                    .background(if (i <= bars) activeColor else HexBorderDark)
-            )
-        }
-    }
-}
-
-/**
- * Minimalist, elegant empty state with understated copy and direct action.
+ * Clean Empty State View.
  */
 @Composable
 fun HexEmptyState(
     icon: ImageVector,
     title: String,
     subtitle: String,
+    modifier: Modifier = Modifier,
     actionLabel: String? = null,
-    onAction: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    onAction: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp, vertical = 48.dp),
+            .padding(horizontal = 32.dp, vertical = 64.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(60.dp)
                 .clip(CircleShape)
-                .background(HexSurfaceSubtleDark),
+                .background(HexSurfaceSubtleDark)
+                .border(1.dp, HexBorderDark, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = HexTextSecondaryDark,
-                modifier = Modifier.size(22.dp)
+                tint = HexPeriwinkle,
+                modifier = Modifier.size(28.dp)
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Text(
             text = title,
+            fontFamily = HexnetFontFamily,
+            fontSize = 17.sp,
+            fontWeight = FontWeight.Bold,
             color = HexTextPrimaryDark,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = subtitle,
-            color = HexTextSecondaryDark,
-            fontSize = 13.sp,
-            lineHeight = 18.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
 
-        if (actionLabel != null && onAction != null) {
-            Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = subtitle,
+            fontFamily = HexnetFontFamily,
+            fontSize = 13.sp,
+            color = HexTextSecondaryDark,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            lineHeight = 18.sp
+        )
+
+        if (actionLabel != null) {
+            Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = onAction,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = HexAccentPrimary,
-                    contentColor = Color.White
+                    containerColor = HexPeriwinkle,
+                    contentColor = Color(0xFF09090B)
                 ),
-                shape = RoundedCornerShape(8.dp),
-                contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp)
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.height(42.dp)
             ) {
                 Text(
                     text = actionLabel,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 13.sp
+                    fontFamily = HexnetFontFamily,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
     }
 }
-
-/**
- * Clean hairline section header with quiet unboxed typography.
- */
-@Composable
-fun HexSectionHeader(
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = title,
-            color = HexTextSecondaryDark,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
-        )
-        HorizontalDivider(color = HexBorderSubtleDark, thickness = 0.5.dp)
-    }
-}
-

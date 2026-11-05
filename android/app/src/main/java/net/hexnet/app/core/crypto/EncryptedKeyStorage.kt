@@ -23,13 +23,82 @@ class EncryptedKeyStorage(
     private val prefs: SharedPreferences? = null
 ) : KeyStorage {
 
-    companion object {
+    companion object Serializer {
         private const val ANDROID_KEYSTORE = "AndroidKeyStore"
         private const val KEY_ALIAS = "hexnet_master_identity_key"
         private const val PREFS_NAME = "hexnet_crypto_vault"
         private const val PREF_KEY_IDENTITY = "encrypted_node_identity"
         private const val GCM_TAG_LENGTH = 128
         private const val GCM_IV_LENGTH = 12
+
+        fun serializeIdentity(identity: NodeIdentity): ByteArray {
+            val uBytes = identity.username.toByteArray(Charsets.UTF_8)
+            val dBytes = identity.displayName.toByteArray(Charsets.UTF_8)
+            val hBytes = identity.hexAddress.toByteArray(Charsets.UTF_8)
+            val fBytes = identity.keyFingerprint.toByteArray(Charsets.UTF_8)
+
+            val totalSize = 2 + uBytes.size +
+                    2 + dBytes.size +
+                    2 + hBytes.size +
+                    2 + fBytes.size +
+                    32 + 32 + // x25519 priv, pub
+                    32 + 32 + // ed25519 priv, pub
+                    8 // createdAtEpochMs
+
+            val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.BIG_ENDIAN)
+            buffer.putShort(uBytes.size.toShort())
+            buffer.put(uBytes)
+            buffer.putShort(dBytes.size.toShort())
+            buffer.put(dBytes)
+            buffer.putShort(hBytes.size.toShort())
+            buffer.put(hBytes)
+            buffer.putShort(fBytes.size.toShort())
+            buffer.put(fBytes)
+
+            buffer.put(identity.x25519KeyPair.privateKey)
+            buffer.put(identity.x25519KeyPair.publicKey)
+            buffer.put(identity.ed25519KeyPair.privateKey)
+            buffer.put(identity.ed25519KeyPair.publicKey)
+            buffer.putLong(identity.createdAtEpochMs)
+
+            return buffer.array()
+        }
+
+        fun deserializeIdentity(bytes: ByteArray): NodeIdentity {
+            val buffer = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN)
+
+            val uLen = buffer.short.toInt() and 0xFFFF
+            val uBytes = ByteArray(uLen).also { buffer.get(it) }
+            val username = String(uBytes, Charsets.UTF_8)
+
+            val dLen = buffer.short.toInt() and 0xFFFF
+            val dBytes = ByteArray(dLen).also { buffer.get(it) }
+            val displayName = String(dBytes, Charsets.UTF_8)
+
+            val hLen = buffer.short.toInt() and 0xFFFF
+            val hBytes = ByteArray(hLen).also { buffer.get(it) }
+            val hexAddress = String(hBytes, Charsets.UTF_8)
+
+            val fLen = buffer.short.toInt() and 0xFFFF
+            val fBytes = ByteArray(fLen).also { buffer.get(it) }
+            val fingerprint = String(fBytes, Charsets.UTF_8)
+
+            val xPriv = ByteArray(32).also { buffer.get(it) }
+            val xPub = ByteArray(32).also { buffer.get(it) }
+            val edPriv = ByteArray(32).also { buffer.get(it) }
+            val edPub = ByteArray(32).also { buffer.get(it) }
+            val createdAt = buffer.getLong()
+
+            return NodeIdentity(
+                username = username,
+                displayName = displayName,
+                hexAddress = hexAddress,
+                keyFingerprint = fingerprint,
+                x25519KeyPair = KeyPairBytes(xPriv, xPub),
+                ed25519KeyPair = KeyPairBytes(edPriv, edPub),
+                createdAtEpochMs = createdAt
+            )
+        }
     }
 
     private val sharedPreferences: SharedPreferences? by lazy {
@@ -137,77 +206,6 @@ class EncryptedKeyStorage(
             }
         } catch (e: Exception) {
             // Ignored in test environment
-        }
-    }
-
-    companion object Serializer {
-        fun serializeIdentity(identity: NodeIdentity): ByteArray {
-            val uBytes = identity.username.toByteArray(Charsets.UTF_8)
-            val dBytes = identity.displayName.toByteArray(Charsets.UTF_8)
-            val hBytes = identity.hexAddress.toByteArray(Charsets.UTF_8)
-            val fBytes = identity.keyFingerprint.toByteArray(Charsets.UTF_8)
-
-            val totalSize = 2 + uBytes.size +
-                    2 + dBytes.size +
-                    2 + hBytes.size +
-                    2 + fBytes.size +
-                    32 + 32 + // x25519 priv, pub
-                    32 + 32 + // ed25519 priv, pub
-                    8 // createdAtEpochMs
-
-            val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.BIG_ENDIAN)
-            buffer.putShort(uBytes.size.toShort())
-            buffer.put(uBytes)
-            buffer.putShort(dBytes.size.toShort())
-            buffer.put(dBytes)
-            buffer.putShort(hBytes.size.toShort())
-            buffer.put(hBytes)
-            buffer.putShort(fBytes.size.toShort())
-            buffer.put(fBytes)
-
-            buffer.put(identity.x25519KeyPair.privateKey)
-            buffer.put(identity.x25519KeyPair.publicKey)
-            buffer.put(identity.ed25519KeyPair.privateKey)
-            buffer.put(identity.ed25519KeyPair.publicKey)
-            buffer.putLong(identity.createdAtEpochMs)
-
-            return buffer.array()
-        }
-
-        fun deserializeIdentity(bytes: ByteArray): NodeIdentity {
-            val buffer = ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN)
-
-            val uLen = buffer.short.toInt() and 0xFFFF
-            val uBytes = ByteArray(uLen).also { buffer.get(it) }
-            val username = String(uBytes, Charsets.UTF_8)
-
-            val dLen = buffer.short.toInt() and 0xFFFF
-            val dBytes = ByteArray(dLen).also { buffer.get(it) }
-            val displayName = String(dBytes, Charsets.UTF_8)
-
-            val hLen = buffer.short.toInt() and 0xFFFF
-            val hBytes = ByteArray(hLen).also { buffer.get(it) }
-            val hexAddress = String(hBytes, Charsets.UTF_8)
-
-            val fLen = buffer.short.toInt() and 0xFFFF
-            val fBytes = ByteArray(fLen).also { buffer.get(it) }
-            val fingerprint = String(fBytes, Charsets.UTF_8)
-
-            val xPriv = ByteArray(32).also { buffer.get(it) }
-            val xPub = ByteArray(32).also { buffer.get(it) }
-            val edPriv = ByteArray(32).also { buffer.get(it) }
-            val edPub = ByteArray(32).also { buffer.get(it) }
-            val createdAt = buffer.getLong()
-
-            return NodeIdentity(
-                username = username,
-                displayName = displayName,
-                hexAddress = hexAddress,
-                keyFingerprint = fingerprint,
-                x25519KeyPair = KeyPairBytes(xPriv, xPub),
-                ed25519KeyPair = KeyPairBytes(edPriv, edPub),
-                createdAtEpochMs = createdAt
-            )
         }
     }
 }

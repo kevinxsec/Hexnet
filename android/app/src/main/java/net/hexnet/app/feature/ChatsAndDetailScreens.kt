@@ -21,12 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
 import net.hexnet.app.core.designsystem.components.*
 import net.hexnet.app.core.designsystem.theme.*
 import net.hexnet.app.core.model.*
@@ -34,9 +32,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 /**
- * Screen 2: Main Messaging Interface — THE HERO SCREEN
- * Premium, minimalist conversation list (Signal/Linear-inspired).
- * Clean hairline dividers, zero excessive cards, dominant conversation list.
+ * Screen: Main Messages Home Screen
+ * Clean, premium, spacious Android messenger (Samsung One UI / Pixel / iOS visual polish).
+ * Pure AMOLED black, edge-to-edge conversation rows, subtle dividers, zero technical clutter.
  */
 @Composable
 fun ChatsScreen(
@@ -49,7 +47,6 @@ fun ChatsScreen(
     onStartNewChatWithHex: (targetHex: String, title: String) -> Unit = { _, _ -> }
 ) {
     var searchQuery by remember { mutableStateOf("") }
-    var isSearchActive by remember { mutableStateOf(false) }
     var activeTab by remember { mutableStateOf("direct") } // "direct" | "rooms"
     var showNewChatDialog by remember { mutableStateOf(false) }
 
@@ -75,15 +72,18 @@ fun ChatsScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showNewChatDialog = true },
-                containerColor = HexAccentPrimary,
-                contentColor = Color.White,
+                containerColor = HexPeriwinkle,
+                contentColor = Color(0xFF09090B),
                 shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 3.dp, pressedElevation = 6.dp)
+                modifier = Modifier
+                    .padding(bottom = 72.dp) // Avoid overlap with floating bottom nav
+                    .size(54.dp),
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp, pressedElevation = 8.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "New Conversation",
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
@@ -93,133 +93,176 @@ fun ChatsScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Elegant Top App Bar
-            Surface(
-                color = HexBackgroundDark,
-                modifier = Modifier.fillMaxWidth()
+            // One UI Expansive Header Area
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .statusBarsPadding()
-                        .padding(horizontal = 18.dp, vertical = 12.dp)
+                // Connection Indicator + Actions
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Column {
-                            Text(
-                                text = "Messages",
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = HexTextPrimaryDark,
-                                letterSpacing = (-0.4).sp
-                            )
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(5.dp),
-                                modifier = Modifier.padding(top = 1.dp)
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(6.dp)
-                                        .clip(CircleShape)
-                                        .background(if (meshActive) HexSuccessDirect else HexTextMutedDark)
-                                )
-                                Text(
-                                    text = if (connectedPeersCount > 0) "$connectedPeersCount peers in range" else "BLE mesh active",
-                                    fontSize = 11.sp,
-                                    color = HexTextSecondaryDark
-                                )
-                            }
-                        }
-
-                        IconButton(
-                            onClick = { isSearchActive = !isSearchActive }
-                        ) {
-                            Icon(
-                                imageVector = if (isSearchActive) Icons.Default.Close else Icons.Default.Search,
-                                contentDescription = "Search",
-                                tint = HexTextSecondaryDark,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+                        Box(
+                            modifier = Modifier
+                                .size(7.dp)
+                                .clip(CircleShape)
+                                .background(if (meshActive) HexMint else HexTextMutedDark)
+                        )
+                        Text(
+                            text = if (connectedPeersCount > 0) "$connectedPeersCount peers connected" else "Mesh active",
+                            fontFamily = HexnetFontFamily,
+                            fontSize = 11.sp,
+                            color = HexTextSecondaryDark
+                        )
                     }
 
-                    // Expandable Hairline Search Bar
-                    AnimatedVisibility(
-                        visible = isSearchActive,
-                        enter = fadeIn() + expandVertically(),
-                        exit = fadeOut() + shrinkVertically()
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(HexSurfaceSubtleDark)
+                            .border(1.dp, HexBorderDark, RoundedCornerShape(12.dp))
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
                     ) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            placeholder = { Text("Search messages or hex...", fontSize = 13.sp, color = HexTextMutedDark) },
-                            singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = HexSurfaceDark,
-                                unfocusedContainerColor = HexSurfaceDark,
-                                focusedBorderColor = HexAccentPrimary,
-                                unfocusedBorderColor = HexBorderSubtleDark,
-                                focusedTextColor = HexTextPrimaryDark,
-                                unfocusedTextColor = HexTextPrimaryDark
-                            ),
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 10.dp)
-                                .height(46.dp)
+                        Text(
+                            text = "OFFLINE P2P",
+                            fontFamily = HexnetFontFamily,
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = HexPeriwinkle
                         )
                     }
                 }
-            }
 
-            // Clean Quiet Tab Selector (Unboxed Segment)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Large Expressive "Messages" Title
                 Text(
-                    text = "Direct (${conversations.size})",
-                    fontSize = 13.sp,
-                    fontWeight = if (activeTab == "direct") FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (activeTab == "direct") HexTextPrimaryDark else HexTextMutedDark,
-                    modifier = Modifier
-                        .clickable { activeTab = "direct" }
-                        .padding(vertical = 6.dp)
+                    text = "Messages",
+                    fontFamily = HexnetFontFamily,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = HexTextPrimaryDark,
+                    letterSpacing = (-0.6).sp
                 )
-                Text(
-                    text = "Channels (${rooms.size})",
-                    fontSize = 13.sp,
-                    fontWeight = if (activeTab == "rooms") FontWeight.SemiBold else FontWeight.Normal,
-                    color = if (activeTab == "rooms") HexTextPrimaryDark else HexTextMutedDark,
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Translucent Liquid Glass Search Control
+                Surface(
                     modifier = Modifier
-                        .clickable { activeTab = "rooms" }
-                        .padding(vertical = 6.dp)
-                )
+                        .fillMaxWidth()
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(22.dp))
+                        .border(1.dp, HexGlassBorder, RoundedCornerShape(22.dp)),
+                    color = HexSurfaceSubtleDark
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = HexTextMutedDark,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            placeholder = {
+                                Text(
+                                    text = "Search conversations or channels...",
+                                    fontFamily = HexnetFontFamily,
+                                    fontSize = 13.sp,
+                                    color = HexTextMutedDark
+                                )
+                            },
+                            singleLine = true,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                focusedTextColor = HexTextPrimaryDark,
+                                unfocusedTextColor = HexTextPrimaryDark,
+                                cursorColor = HexPeriwinkle
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                        if (searchQuery.isNotBlank()) {
+                            IconButton(
+                                onClick = { searchQuery = "" },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Clear",
+                                    tint = HexTextSecondaryDark,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Minimal Direct / Channels Selector
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Direct (${conversations.size})",
+                        fontFamily = HexnetFontFamily,
+                        fontSize = 13.sp,
+                        fontWeight = if (activeTab == "direct") FontWeight.Bold else FontWeight.Normal,
+                        color = if (activeTab == "direct") HexPeriwinkle else HexTextMutedDark,
+                        modifier = Modifier
+                            .clickable { activeTab = "direct" }
+                            .padding(vertical = 4.dp)
+                    )
+                    Text(
+                        text = "Channels (${rooms.size})",
+                        fontFamily = HexnetFontFamily,
+                        fontSize = 13.sp,
+                        fontWeight = if (activeTab == "rooms") FontWeight.Bold else FontWeight.Normal,
+                        color = if (activeTab == "rooms") HexPeriwinkle else HexTextMutedDark,
+                        modifier = Modifier
+                            .clickable { activeTab = "rooms" }
+                            .padding(vertical = 4.dp)
+                    )
+                }
             }
 
             HorizontalDivider(color = HexBorderSubtleDark, thickness = 0.5.dp)
 
-            // Conversation List (Dominating the Viewport)
+            // Spacious Conversation List (Dominating available screen space)
             if (activeTab == "direct") {
                 if (filteredConversations.isEmpty()) {
                     HexEmptyState(
                         icon = Icons.Outlined.ChatBubbleOutline,
                         title = if (searchQuery.isNotBlank()) "No matches found" else "No conversations yet",
-                        subtitle = if (searchQuery.isNotBlank()) "Try a different search term" else "Discovered nearby Bluetooth mesh peers will appear automatically. You can also start a chat with any peer's hex address.",
-                        actionLabel = "Start New Chat",
+                        subtitle = if (searchQuery.isNotBlank()) "Try a different search query" else "Nearby mesh peers will appear automatically. Tap the compose button to start a chat with any peer address.",
+                        actionLabel = "Start Chat",
                         onAction = { showNewChatDialog = true }
                     )
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 88.dp)
+                        contentPadding = PaddingValues(bottom = 96.dp)
                     ) {
                         items(filteredConversations, key = { it.id }) { conversation ->
                             ConversationListRow(
@@ -229,7 +272,7 @@ fun ChatsScreen(
                             HorizontalDivider(
                                 color = HexBorderSubtleDark,
                                 thickness = 0.5.dp,
-                                modifier = Modifier.padding(start = 72.dp)
+                                modifier = Modifier.padding(start = 76.dp)
                             )
                         }
                     }
@@ -239,12 +282,12 @@ fun ChatsScreen(
                     HexEmptyState(
                         icon = Icons.Outlined.Tag,
                         title = "No channels found",
-                        subtitle = "Public mesh broadcast channels allow offline group communication across the mesh."
+                        subtitle = "Public mesh broadcast channels enable offline group communication with nearby peers."
                     )
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 88.dp)
+                        contentPadding = PaddingValues(bottom = 96.dp)
                     ) {
                         items(filteredRooms, key = { it.id }) { room ->
                             RoomListRow(
@@ -254,7 +297,7 @@ fun ChatsScreen(
                             HorizontalDivider(
                                 color = HexBorderSubtleDark,
                                 thickness = 0.5.dp,
-                                modifier = Modifier.padding(start = 72.dp)
+                                modifier = Modifier.padding(start = 76.dp)
                             )
                         }
                     }
@@ -275,6 +318,11 @@ fun ChatsScreen(
     }
 }
 
+/**
+ * Clean edge-to-edge conversation row.
+ * Contains only: Avatar, Contact name, One-line message preview, Small timestamp, Subtle unread indicator.
+ * Zero RSSI, RTT, or technical telemetry clutter.
+ */
 @Composable
 private fun ConversationListRow(
     conversation: Conversation,
@@ -284,13 +332,13 @@ private fun ConversationListRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 12.dp),
+            .padding(horizontal = 20.dp, vertical = 13.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         HexAvatar(
             name = conversation.title,
             hexAddress = conversation.targetHexAddress,
-            size = 44,
+            size = 46,
             isDirect = conversation.isDirectNeighbor
         )
 
@@ -304,6 +352,7 @@ private fun ConversationListRow(
             ) {
                 Text(
                     text = conversation.title,
+                    fontFamily = HexnetFontFamily,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = HexTextPrimaryDark,
@@ -313,13 +362,13 @@ private fun ConversationListRow(
 
                 Text(
                     text = formatRelativeTime(conversation.lastMessageTimestamp),
+                    fontFamily = HexnetFontFamily,
                     fontSize = 11.sp,
-                    color = HexTextMutedDark,
-                    fontFamily = FontFamily.Monospace
+                    color = HexTextMutedDark
                 )
             }
 
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(3.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -327,7 +376,8 @@ private fun ConversationListRow(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = conversation.lastMessageText,
+                    text = conversation.lastMessageText.ifBlank { "No messages yet" },
+                    fontFamily = HexnetFontFamily,
                     fontSize = 13.sp,
                     color = if (conversation.unreadCount > 0) HexTextPrimaryDark else HexTextSecondaryDark,
                     maxLines = 1,
@@ -341,12 +391,13 @@ private fun ConversationListRow(
                             .padding(start = 8.dp)
                             .size(18.dp)
                             .clip(CircleShape)
-                            .background(HexAccentPrimary),
+                            .background(HexPeriwinkle),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = conversation.unreadCount.toString(),
-                            color = Color.White,
+                            color = Color(0xFF09090B),
+                            fontFamily = HexnetFontFamily,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -366,21 +417,21 @@ private fun RoomListRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 12.dp),
+            .padding(horizontal = 20.dp, vertical = 13.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(44.dp)
+                .size(46.dp)
                 .clip(CircleShape)
                 .background(HexSurfaceSubtleDark)
-                .border(0.5.dp, HexBorderDark, CircleShape),
+                .border(1.dp, HexBorderDark, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Tag,
                 contentDescription = null,
-                tint = HexTextSecondaryDark,
+                tint = HexLavender,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -395,6 +446,7 @@ private fun RoomListRow(
             ) {
                 Text(
                     text = room.name,
+                    fontFamily = HexnetFontFamily,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = HexTextPrimaryDark
@@ -402,15 +454,17 @@ private fun RoomListRow(
 
                 Text(
                     text = "${room.participantCount} peers",
+                    fontFamily = HexnetFontFamily,
                     fontSize = 11.sp,
                     color = HexTextMutedDark
                 )
             }
 
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(3.dp))
 
             Text(
-                text = room.topic,
+                text = room.topic.ifBlank { "Public mesh broadcast channel" },
+                fontFamily = HexnetFontFamily,
                 fontSize = 13.sp,
                 color = HexTextSecondaryDark,
                 maxLines = 1,
@@ -421,9 +475,10 @@ private fun RoomListRow(
 }
 
 /**
- * Screen 3: Conversation Detail (Actual Messaging View)
- * Signal/Linear-style chat with clean bubbles, incoming/outgoing distinction,
- * micro-timestamps, and minimal security lock indicator.
+ * Screen: Direct Conversation View
+ * Premium Android messaging experience.
+ * Minimal contact header, clean message bubbles with proper grouping and asymmetric corners,
+ * readable timestamps, small encryption indicator, and floating translucent composer.
  */
 @Composable
 fun ConversationScreen(
@@ -442,7 +497,7 @@ fun ConversationScreen(
     var showInfoSheet by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
 
-    // Scroll to latest message
+    // Auto-scroll on new messages
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
@@ -476,7 +531,7 @@ fun ConversationScreen(
                         HexAvatar(
                             name = title,
                             hexAddress = targetHex,
-                            size = 36,
+                            size = 38,
                             isDirect = isDirectLink,
                             isVerified = isIdentityVerified
                         )
@@ -490,8 +545,9 @@ fun ConversationScreen(
                         ) {
                             Text(
                                 text = title,
+                                fontFamily = HexnetFontFamily,
                                 fontSize = 15.sp,
-                                fontWeight = FontWeight.SemiBold,
+                                fontWeight = FontWeight.Bold,
                                 color = HexTextPrimaryDark,
                                 maxLines = 1
                             )
@@ -502,11 +558,12 @@ fun ConversationScreen(
                                 Icon(
                                     imageVector = Icons.Default.Lock,
                                     contentDescription = "Encrypted",
-                                    tint = HexTextMutedDark,
-                                    modifier = Modifier.size(10.dp)
+                                    tint = HexViolet,
+                                    modifier = Modifier.size(11.dp)
                                 )
                                 Text(
-                                    text = if (isDirectLink) "Direct BLE · Noise E2EE" else "Relayed Mesh · Noise E2EE",
+                                    text = if (isDirectLink) "Direct P2P · Noise E2EE" else "Mesh Relay · Noise E2EE",
+                                    fontFamily = HexnetFontFamily,
                                     fontSize = 11.sp,
                                     color = HexTextSecondaryDark
                                 )
@@ -516,7 +573,7 @@ fun ConversationScreen(
                         IconButton(onClick = { showInfoSheet = true }) {
                             Icon(
                                 imageVector = Icons.Outlined.Info,
-                                contentDescription = "Info",
+                                contentDescription = "Details",
                                 tint = HexTextSecondaryDark,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -527,36 +584,50 @@ fun ConversationScreen(
             }
         },
         bottomBar = {
-            // Elegant Minimalist Message Composer
-            Surface(
-                color = HexBackgroundDark,
+            // Elegant Floating Translucent Composer
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .imePadding()
+                    .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
-                Column {
-                    HorizontalDivider(color = HexBorderSubtleDark, thickness = 0.5.dp)
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(26.dp))
+                        .border(1.dp, HexGlassBorder, RoundedCornerShape(26.dp)),
+                    color = Color(0xF2101014),
+                    tonalElevation = 0.dp
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        OutlinedTextField(
+                        TextField(
                             value = inputText,
                             onValueChange = { inputText = it },
-                            placeholder = { Text("Message...", fontSize = 14.sp, color = HexTextMutedDark) },
+                            placeholder = {
+                                Text(
+                                    text = "Message $title...",
+                                    fontFamily = HexnetFontFamily,
+                                    fontSize = 14.sp,
+                                    color = HexTextMutedDark
+                                )
+                            },
                             maxLines = 4,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = HexSurfaceDark,
-                                unfocusedContainerColor = HexSurfaceDark,
-                                focusedBorderColor = HexBorderDark,
-                                unfocusedBorderColor = HexBorderSubtleDark,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
                                 focusedTextColor = HexTextPrimaryDark,
-                                unfocusedTextColor = HexTextPrimaryDark
+                                unfocusedTextColor = HexTextPrimaryDark,
+                                cursorColor = HexPeriwinkle
                             ),
-                            shape = RoundedCornerShape(20.dp),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                             keyboardActions = KeyboardActions(
                                 onSend = {
@@ -568,10 +639,10 @@ fun ConversationScreen(
                             ),
                             modifier = Modifier
                                 .weight(1f)
-                                .heightIn(min = 42.dp, max = 100.dp)
+                                .heightIn(min = 40.dp, max = 110.dp)
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
 
                         IconButton(
                             onClick = {
@@ -582,15 +653,15 @@ fun ConversationScreen(
                             },
                             enabled = inputText.isNotBlank(),
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(38.dp)
                                 .clip(CircleShape)
-                                .background(if (inputText.isNotBlank()) HexAccentPrimary else HexSurfaceSubtleDark)
+                                .background(if (inputText.isNotBlank()) HexPeriwinkle else HexSurfaceElevatedDark)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.ArrowUpward,
                                 contentDescription = "Send",
-                                tint = if (inputText.isNotBlank()) Color.White else HexTextMutedDark,
-                                modifier = Modifier.size(20.dp)
+                                tint = if (inputText.isNotBlank()) Color(0xFF09090B) else HexTextMutedDark,
+                                modifier = Modifier.size(19.dp)
                             )
                         }
                     }
@@ -607,23 +678,24 @@ fun ConversationScreen(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             item {
-                // Tasteful 1-Line Security Notice
+                // Tasteful 1-Line Minimal Encryption Notice
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Lock,
                         contentDescription = null,
-                        tint = HexTextMutedDark,
+                        tint = HexViolet,
                         modifier = Modifier.size(11.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "End-to-end encrypted with Noise_XX_25519_ChaChaPoly_BLAKE2s",
+                        text = "Forward-secure Noise_XX encryption active",
+                        fontFamily = HexnetFontFamily,
                         fontSize = 11.sp,
                         color = HexTextMutedDark
                     )
@@ -651,6 +723,11 @@ fun ConversationScreen(
     }
 }
 
+/**
+ * Beautiful asymmetric message bubbles.
+ * Outgoing: Electric Periwinkle with white text.
+ * Incoming: Obsidian Tier 2 with crisp light text.
+ */
 @Composable
 private fun MessageBubble(
     message: Message,
@@ -668,59 +745,70 @@ private fun MessageBubble(
     ) {
         Box(
             modifier = Modifier
-                .widthIn(max = 280.dp)
+                .widthIn(max = 290.dp)
                 .clip(
                     RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomStart = if (isOutgoing) 16.dp else 2.dp,
-                        bottomEnd = if (isOutgoing) 2.dp else 16.dp
+                        topStart = 18.dp,
+                        topEnd = 18.dp,
+                        bottomStart = if (isOutgoing) 18.dp else 4.dp,
+                        bottomEnd = if (isOutgoing) 4.dp else 18.dp
                     )
                 )
                 .background(
                     when {
-                        isFailed -> HexErrorAlert.copy(alpha = 0.15f)
-                        isOutgoing -> HexAccentPrimary
+                        isFailed -> HexCoral.copy(alpha = 0.15f)
+                        isOutgoing -> Color(0x338795FF) // Restrained Periwinkle tint
                         else -> HexSurfaceSubtleDark
                     }
                 )
-                .then(
-                    if (isFailed) Modifier.border(0.5.dp, HexErrorAlert, RoundedCornerShape(16.dp))
-                    else if (!isOutgoing) Modifier.border(0.5.dp, HexBorderDark, RoundedCornerShape(16.dp))
-                    else Modifier
+                .border(
+                    width = 1.dp,
+                    color = when {
+                        isFailed -> HexCoral
+                        isOutgoing -> Color(0x668795FF)
+                        else -> HexBorderDark
+                    },
+                    shape = RoundedCornerShape(
+                        topStart = 18.dp,
+                        topEnd = 18.dp,
+                        bottomStart = if (isOutgoing) 18.dp else 4.dp,
+                        bottomEnd = if (isOutgoing) 4.dp else 18.dp
+                    )
                 )
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .padding(horizontal = 14.dp, vertical = 9.dp)
         ) {
             Column {
                 if (!isOutgoing && message.senderUsername.isNotBlank()) {
                     Text(
                         text = message.senderUsername,
+                        fontFamily = HexnetFontFamily,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = HexTextSecondaryDark,
+                        color = HexLavender,
                         modifier = Modifier.padding(bottom = 2.dp)
                     )
                 }
 
                 Text(
                     text = message.content,
+                    fontFamily = HexnetFontFamily,
                     fontSize = 14.sp,
-                    lineHeight = 19.sp,
-                    color = if (isOutgoing) Color.White else HexTextPrimaryDark
+                    lineHeight = 20.sp,
+                    color = HexTextPrimaryDark
                 )
 
-                Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Row(
                     modifier = Modifier.align(Alignment.End),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
                         text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(message.timestampEpochMs)),
+                        fontFamily = HexnetFontFamily,
                         fontSize = 10.sp,
-                        color = if (isOutgoing) Color.White.copy(alpha = 0.7f) else HexTextMutedDark,
-                        fontFamily = FontFamily.Monospace
+                        color = HexTextMutedDark
                     )
 
                     if (isOutgoing) {
@@ -732,9 +820,10 @@ private fun MessageBubble(
 
         if (isFailed) {
             Text(
-                text = "Failed · Tap to retry",
+                text = "Failed to deliver · Tap to retry",
+                fontFamily = HexnetFontFamily,
                 fontSize = 11.sp,
-                color = HexErrorAlert,
+                color = HexCoral,
                 modifier = Modifier
                     .clickable(onClick = onRetry)
                     .padding(top = 2.dp, end = 4.dp)
@@ -743,6 +832,9 @@ private fun MessageBubble(
     }
 }
 
+/**
+ * Dedicated diagnostics bottom sheet (technical details live here, not in the chat).
+ */
 @Composable
 private fun ConversationDiagnosticsDialog(
     title: String,
@@ -753,24 +845,34 @@ private fun ConversationDiagnosticsDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = HexSurfaceDark,
+        containerColor = HexSurfaceSubtleDark,
         titleContentColor = HexTextPrimaryDark,
         textContentColor = HexTextSecondaryDark,
         title = {
-            Text("Connection Details", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = "Peer Connection Info",
+                fontFamily = HexnetFontFamily,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold
+            )
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                DetailRow("Recipient", title)
-                DetailRow("Hex Address", targetHex.ifEmpty { "N/A" })
-                DetailRow("Route", if (isDirectLink) "Direct 1-Hop BLE" else "Multi-Hop Mesh")
-                DetailRow("Protocol", "Noise_XX_25519_ChaChaPoly")
-                DetailRow("Verification", if (isIdentityVerified) "Cryptographically Verified" else "Unverified")
+                DetailRow("Peer Name", title)
+                DetailRow("Node Hex", targetHex.ifEmpty { "Broadcast / Local" })
+                DetailRow("Transport", if (isDirectLink) "Direct 1-Hop Bluetooth LE" else "Multi-Hop Mesh Relay")
+                DetailRow("Cryptography", "Noise_XX_25519_ChaChaPoly_BLAKE2s")
+                DetailRow("Key Status", if (isIdentityVerified) "Ed25519 Verified" else "Unverified")
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Close", color = HexAccentPrimary)
+                Text(
+                    text = "Done",
+                    fontFamily = HexnetFontFamily,
+                    color = HexPeriwinkle,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     )
@@ -780,104 +882,173 @@ private fun ConversationDiagnosticsDialog(
 private fun DetailRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, fontSize = 12.sp, color = HexTextMutedDark)
-        Text(value, fontSize = 12.sp, color = HexTextPrimaryDark, fontFamily = FontFamily.Monospace)
+        Text(
+            text = label,
+            fontFamily = HexnetFontFamily,
+            fontSize = 12.sp,
+            color = HexTextMutedDark
+        )
+        Text(
+            text = value,
+            fontFamily = HexnetFontFamily,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = HexTextPrimaryDark
+        )
     }
 }
 
 @Composable
-private fun NewConversationDialog(
+fun NewConversationDialog(
     peers: List<Peer>,
     onDismiss: () -> Unit,
     onStartChat: (hex: String, title: String) -> Unit
 ) {
     var hexInput by remember { mutableStateOf("") }
-    var nameInput by remember { mutableStateOf("") }
+    var titleInput by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = HexSurfaceDark,
-        titleContentColor = HexTextPrimaryDark,
-        title = { Text("New Conversation", fontSize = 17.sp, fontWeight = FontWeight.Bold) },
+        containerColor = HexSurfaceSubtleDark,
+        title = {
+            Text(
+                text = "New Conversation",
+                fontFamily = HexnetFontFamily,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = HexTextPrimaryDark
+            )
+        },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Enter a peer's 4-character node hex or select from discovered nearby peers:",
+                    fontFamily = HexnetFontFamily,
+                    fontSize = 12.sp,
+                    color = HexTextSecondaryDark
+                )
+
+                OutlinedTextField(
+                    value = hexInput,
+                    onValueChange = { hexInput = it.trim().uppercase() },
+                    label = { Text("Peer Hex (e.g. 8B2F)", fontFamily = HexnetFontFamily, fontSize = 11.sp) },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = HexSurfaceDark,
+                        unfocusedContainerColor = HexSurfaceDark,
+                        focusedBorderColor = HexPeriwinkle,
+                        unfocusedBorderColor = HexBorderDark,
+                        focusedTextColor = HexTextPrimaryDark,
+                        unfocusedTextColor = HexTextPrimaryDark
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = titleInput,
+                    onValueChange = { titleInput = it },
+                    label = { Text("Display Name (optional)", fontFamily = HexnetFontFamily, fontSize = 11.sp) },
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = HexSurfaceDark,
+                        unfocusedContainerColor = HexSurfaceDark,
+                        focusedBorderColor = HexPeriwinkle,
+                        unfocusedBorderColor = HexBorderDark,
+                        focusedTextColor = HexTextPrimaryDark,
+                        unfocusedTextColor = HexTextPrimaryDark
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
                 if (peers.isNotEmpty()) {
-                    Text("Discovered Peers", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = HexTextSecondaryDark)
-                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        peers.take(3).forEach { peer ->
+                    Text(
+                        text = "Discovered Nearby:",
+                        fontFamily = HexnetFontFamily,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = HexTextSecondaryDark
+                    )
+
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        peers.take(4).forEach { peer ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(8.dp))
-                                    .clickable { onStartChat(peer.hexAddress, peer.displayName) }
-                                    .background(HexSurfaceSubtleDark)
-                                    .padding(8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    HexAvatar(name = peer.displayName, hexAddress = peer.hexAddress, size = 28)
-                                    Column {
-                                        Text(peer.displayName, fontSize = 13.sp, color = HexTextPrimaryDark, fontWeight = FontWeight.Medium)
-                                        Text(peer.hexAddress, fontSize = 10.sp, color = HexTextMutedDark, fontFamily = FontFamily.Monospace)
+                                    .background(HexSurfaceDark)
+                                    .clickable {
+                                        onStartChat(peer.hexAddress, peer.username)
                                     }
-                                }
-                                Text("Chat", fontSize = 12.sp, color = HexAccentPrimary, fontWeight = FontWeight.SemiBold)
+                                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = peer.username,
+                                    fontFamily = HexnetFontFamily,
+                                    fontSize = 12.sp,
+                                    color = HexTextPrimaryDark
+                                )
+                                Text(
+                                    text = peer.hexAddress,
+                                    fontFamily = HexnetFontFamily,
+                                    fontSize = 11.sp,
+                                    color = HexPeriwinkle
+                                )
                             }
                         }
                     }
-                    HorizontalDivider(color = HexBorderSubtleDark, thickness = 0.5.dp)
                 }
-
-                Text("Or Enter Hex Address", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = HexTextSecondaryDark)
-                OutlinedTextField(
-                    value = hexInput,
-                    onValueChange = { hexInput = it },
-                    placeholder = { Text("0x1A2B3C4D5E6F7A8B", fontSize = 12.sp, color = HexTextMutedDark) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = nameInput,
-                    onValueChange = { nameInput = it },
-                    placeholder = { Text("Contact Name (optional)", fontSize = 12.sp, color = HexTextMutedDark) },
-                    singleLine = true,
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
         },
         confirmButton = {
             Button(
                 onClick = {
                     if (hexInput.isNotBlank()) {
-                        onStartChat(hexInput.trim(), nameInput.trim().ifEmpty { "Peer" })
+                        val finalTitle = titleInput.ifBlank { "Node $hexInput" }
+                        onStartChat(hexInput, finalTitle)
                     }
                 },
                 enabled = hexInput.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = HexAccentPrimary)
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = HexPeriwinkle,
+                    contentColor = Color(0xFF09090B)
+                ),
+                shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Start Chat", color = Color.White)
+                Text(
+                    text = "Open Chat",
+                    fontFamily = HexnetFontFamily,
+                    fontWeight = FontWeight.Bold
+                )
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel", color = HexTextMutedDark)
+                Text(
+                    text = "Cancel",
+                    fontFamily = HexnetFontFamily,
+                    color = HexTextMutedDark
+                )
             }
         }
     )
 }
 
-private fun formatRelativeTime(epochMs: Long): String {
-    val diffSec = (System.currentTimeMillis() - epochMs) / 1000
+fun formatRelativeTime(timestampEpochMs: Long): String {
+    if (timestampEpochMs <= 0L) return ""
+    val now = System.currentTimeMillis()
+    val diff = now - timestampEpochMs
+
     return when {
-        diffSec < 60 -> "now"
-        diffSec < 3600 -> "${diffSec / 60}m"
-        diffSec < 86400 -> "${diffSec / 3600}h"
-        else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(epochMs))
+        diff < 60_000L -> "now"
+        diff < 3600_000L -> "${diff / 60_000L}m"
+        diff < 86400_000L -> SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestampEpochMs))
+        else -> SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(timestampEpochMs))
     }
 }

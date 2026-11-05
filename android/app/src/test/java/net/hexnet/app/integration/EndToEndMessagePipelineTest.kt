@@ -232,7 +232,7 @@ class EndToEndMessagePipelineTest {
             val msgId = "msg_$packetId"
             val state = when (stateStr) {
                 "SENDING" -> MessageDeliveryState.SENDING
-                "RELAYED" -> MessageDeliveryState.SENT
+                "RELAYED" -> MessageDeliveryState.RELAYED
                 "DELIVERED" -> MessageDeliveryState.DELIVERED
                 "FAILED" -> MessageDeliveryState.FAILED
                 else -> MessageDeliveryState.SENDING
@@ -354,8 +354,8 @@ class EndToEndMessagePipelineTest {
             coroutineScope = testScope
         )
 
-        val localHex = 0xAAAAAAAA11112222L
-        val senderHex = 0xBBBBBBBB33334444L
+        val localHex = 0xAAAAAAAA11112222uL.toLong()
+        val senderHex = 0xBBBBBBBB33334444uL.toLong()
         val senderHexStr = "0x" + java.lang.Long.toHexString(senderHex).padStart(16, '0')
         val packetId = 88776655L
 
@@ -453,8 +453,8 @@ class EndToEndMessagePipelineTest {
     // --- TEST 5: Invalid Authentication & Wrong Destination Rejection ---
     @Test
     fun test_invalid_authentication_and_wrong_destination_rejection() = runBlocking {
-        val localHex = 0xCAFECAFE00000001L
-        val wrongDestHex = 0xDEADBEEF00000002L
+        val localHex = 0xCAFECAFE00000001uL.toLong()
+        val wrongDestHex = 0xDEADBEEF00000002uL.toLong()
         val senderHex = 0x1111222233334444L
 
         // Scenario A: Wrong destination packet

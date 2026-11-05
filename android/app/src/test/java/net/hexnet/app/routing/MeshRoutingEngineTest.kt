@@ -1,6 +1,7 @@
 package net.hexnet.app.routing
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.async
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -78,6 +79,8 @@ class MeshRoutingEngineTest {
                 if (decision.decryptedPayload != null) {
                     receivedPlaintexts.add(String(decision.decryptedPayload, Charsets.UTF_8))
                 }
+            } else if (decision is RoutingDecision.ForwardBroadcast) {
+                receivedPackets.add(decision.packet)
             }
             return decision
         }
@@ -516,6 +519,7 @@ class MeshRoutingEngineTest {
 
         // Now Node C connects to Node B!
         nodeB.engine.handlePeerConnected(nodeC.deviceAddress, nodeC.hexAddress)
+        kotlinx.coroutines.delay(100)
 
         // Queued relay packet must be flushed to Node C!
         assertEquals(1, flushedPackets.size)
@@ -527,7 +531,7 @@ class MeshRoutingEngineTest {
     // TEST 12: Persistent Queue State Recovery
     // ==========================================
     @Test
-    fun testPersistentQueueStateRecovery() {
+    fun testPersistentQueueStateRecovery() = runBlocking {
         val packet = BinaryPacket(
             type = PacketType.DIRECT_MESSAGE,
             sourceHex = nodeA.hexAddress,
@@ -612,9 +616,11 @@ class MeshRoutingEngineTest {
 
         val msg2 = (res1 as HandshakeProcessResult.Reply).messageBytes
         val res2 = nodeA.sessionManager.processHandshakeMessage("cccc0003", msg2)
-        assertTrue(res2 is HandshakeProcessResult.Reply)
-
-        val msg3 = (res2 as HandshakeProcessResult.Reply).messageBytes
+        val msg3 = when (res2) {
+            is HandshakeProcessResult.Reply -> res2.messageBytes
+            is HandshakeProcessResult.EstablishedWithReply -> res2.messageBytes
+            else -> fail("Expected Reply or EstablishedWithReply but got $res2") as Nothing
+        }
         val res3 = nodeC.sessionManager.processHandshakeMessage("aaaa0001", msg3)
         assertTrue(res3 is HandshakeProcessResult.Established)
 
@@ -816,7 +822,11 @@ class MeshRoutingEngineTest {
         val res1 = nodeD.sessionManager.processHandshakeMessage("aaaa0001", msg1)
         val msg2 = (res1 as HandshakeProcessResult.Reply).messageBytes
         val res2 = nodeA.sessionManager.processHandshakeMessage("dddd0004", msg2)
-        val msg3 = (res2 as HandshakeProcessResult.Reply).messageBytes
+        val msg3 = when (res2) {
+            is HandshakeProcessResult.Reply -> res2.messageBytes
+            is HandshakeProcessResult.EstablishedWithReply -> res2.messageBytes
+            else -> fail("Expected Reply or EstablishedWithReply but got $res2") as Nothing
+        }
         nodeD.sessionManager.processHandshakeMessage("aaaa0001", msg3)
 
         assertTrue(nodeA.sessionManager.hasActiveSession("dddd0004"))
@@ -952,7 +962,7 @@ class MeshRoutingEngineTest {
         // Enqueue operation with very short custom timeout (50ms)
         val op1 = GattOperation.Custom("Test Dropped Callback") { }
         // We override timeoutMs by testing the timeout catch path
-        val job1 = kotlinx.coroutines.async {
+        val job1 = async {
             queue.enqueue(GattOperation.WriteCharacteristic(ByteArray(10), 2))
         }
 

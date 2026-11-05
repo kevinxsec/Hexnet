@@ -230,7 +230,7 @@ class HexnetMeshForegroundService : Service() {
             val msgId = "msg_$packetId"
             val deliveryState = when (stateStr) {
                 "SENDING" -> net.hexnet.app.core.model.MessageDeliveryState.SENDING
-                "RELAYED" -> net.hexnet.app.core.model.MessageDeliveryState.SENT
+                "RELAYED" -> net.hexnet.app.core.model.MessageDeliveryState.RELAYED
                 "DELIVERED" -> net.hexnet.app.core.model.MessageDeliveryState.DELIVERED
                 "FAILED", "FAILED_PERSISTENCE" -> net.hexnet.app.core.model.MessageDeliveryState.FAILED
                 else -> net.hexnet.app.core.model.MessageDeliveryState.SENDING
@@ -319,12 +319,17 @@ class HexnetMeshForegroundService : Service() {
                 Log.d(TAG, "Discovered Hexnet peer: ${peer.device.address} (${peer.rssi} dBm)")
                 val peerId = "peer_${peer.device.address.replace(":", "").lowercase()}"
                 val hexStr = "0x" + peer.device.address.replace(":", "").take(16).lowercase()
+                val devName = try {
+                    peer.device.name
+                } catch (e: SecurityException) {
+                    null
+                }
                 hexApp?.contactsRepository?.upsertPeer(
                     net.hexnet.app.core.model.Peer(
                         peerId = peerId,
                         hexAddress = hexStr,
                         username = "node_" + hexStr.takeLast(6),
-                        displayName = peer.device.name ?: ("Node " + hexStr.take(8)),
+                        displayName = devName ?: ("Node " + hexStr.take(8)),
                         rssiDbm = peer.rssi,
                         hopDistance = 1,
                         isDirectNeighbor = true,

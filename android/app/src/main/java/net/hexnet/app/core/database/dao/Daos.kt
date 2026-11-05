@@ -3,6 +3,7 @@ package net.hexnet.app.core.database.dao
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 import net.hexnet.app.core.database.entity.*
+import net.hexnet.app.core.model.MessageDeliveryState
 
 @Dao
 interface MessageDao {

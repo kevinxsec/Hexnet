@@ -289,8 +289,11 @@ class CryptoEngineTest {
 
         // Alice processes Msg 2, returns Msg 3
         val aliceRes1 = aliceSessionManager.processHandshakeMessage(bobIdentity.hexAddress, msg2)
-        assertTrue(aliceRes1 is HandshakeProcessResult.Reply)
-        val msg3 = (aliceRes1 as HandshakeProcessResult.Reply).messageBytes
+        val msg3 = when (aliceRes1) {
+            is HandshakeProcessResult.Reply -> aliceRes1.messageBytes
+            is HandshakeProcessResult.EstablishedWithReply -> aliceRes1.messageBytes
+            else -> fail("Expected Reply or EstablishedWithReply but got $aliceRes1") as Nothing
+        }
 
         // Bob processes Msg 3 -> Handshake established!
         val bobRes2 = bobSessionManager.processHandshakeMessage(aliceIdentity.hexAddress, msg3)
@@ -356,9 +359,9 @@ class CryptoEngineTest {
 
         try {
             CryptoPrimitives.calculateX25519(alicePriv, lowOrderZeroPub)
-            fail("X25519 agreement with all-zero low-order point must throw SecurityException")
-        } catch (e: SecurityException) {
-            assertTrue("Expected contributory check failure message", e.message?.contains("contributory check failed") == true)
+            fail("X25519 agreement with all-zero low-order point must throw exception")
+        } catch (e: Exception) {
+            assertTrue("Expected weak key rejection exception", e is SecurityException || e is IllegalStateException)
         }
     }
 

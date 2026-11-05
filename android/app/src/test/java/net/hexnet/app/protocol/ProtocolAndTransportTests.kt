@@ -52,7 +52,7 @@ class PacketSerializationTest {
                 hopCount = 1,
                 timestamp = 1710000000000L,
                 packetId = 0x1234567890ABCDEFL,
-                sourceHex = 0x8F4C21B9A45E7D12L,
+                sourceHex = 0x8F4C21B9A45E7D12uL.toLong(),
                 destinationHex = 0x3E11B7D5A89C0042L,
                 payload = payload
             )

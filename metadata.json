@@ -1,0 +1,8 @@
+{
+  "name": "Hexnet - Tactical Mesh Communicator",
+  "description": "Tactical peer-to-peer off-grid mesh networking and encrypted communicator with Noise protocol E2EE, BLE radar, and topology diagnostics.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

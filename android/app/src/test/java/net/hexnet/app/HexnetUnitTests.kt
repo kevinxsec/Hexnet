@@ -2,8 +2,7 @@ package net.hexnet.app
 
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import net.hexnet.app.core.model.MessageDeliveryState
-import net.hexnet.app.core.model.MeshPacket
+import net.hexnet.app.core.model.*
 import net.hexnet.app.data.repository.ContactsRepository
 import net.hexnet.app.data.repository.MessagingRepository
 import net.hexnet.app.domain.MeshRoutingEngine
@@ -144,7 +143,7 @@ class MeshRoutingEngineTest {
 class MessagingRepositoryTest {
     @Test
     fun testSendMessageAddsToQueueAndUpdatesConversation() = runBlocking {
-        val repo = MessagingRepository()
+        val repo = MessagingRepository(coroutineScope = this)
         val initialMessages = repo.getMessages("conv_solaris").first()
         val initialCount = initialMessages.size
 
@@ -154,6 +153,7 @@ class MessagingRepositoryTest {
             senderUsername = "test_user",
             content = "Testing offline queue dispatch"
         )
+        kotlinx.coroutines.delay(50)
 
         assertEquals(MessageDeliveryState.QUEUED, newMsg.state)
         val updatedMessages = repo.getMessages("conv_solaris").first()
@@ -161,6 +161,7 @@ class MessagingRepositoryTest {
 
         // Status transition test
         repo.updateMessageState(newMsg.id, MessageDeliveryState.DELIVERED)
+        kotlinx.coroutines.delay(50)
         val deliveredList = repo.getMessages("conv_solaris").first()
         val verifiedMsg = deliveredList.find { it.id == newMsg.id }
         assertEquals(MessageDeliveryState.DELIVERED, verifiedMsg?.state)
@@ -170,7 +171,21 @@ class MessagingRepositoryTest {
 class ContactsRepositoryTest {
     @Test
     fun testToggleContactAndVerify() = runBlocking {
-        val repo = ContactsRepository()
+        val repo = ContactsRepository(coroutineScope = this)
+        val testPeer = Peer(
+            peerId = "peer_solaris",
+            hexAddress = "0x7F10A4B29C44E100",
+            username = "solaris_node",
+            displayName = "Solaris Prime",
+            rssiDbm = -65,
+            hopDistance = 1,
+            isDirectNeighbor = true,
+            lastSeenEpochMs = System.currentTimeMillis(),
+            status = PeerStatus.ACTIVE_DIRECT,
+            isContact = false
+        )
+        repo.upsertPeer(testPeer)
+
         val peers = repo.peers.first()
         val targetPeer = peers.first()
 
