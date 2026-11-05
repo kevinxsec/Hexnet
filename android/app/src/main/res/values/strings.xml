@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Hexnet</string>
+    <string name="app_tagline">Decentralized Offline Mesh Communication</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_chats">Chats</string>
+    <string name="nav_peers">Peers</string>
+    <string name="nav_mesh">Mesh</string>
+    <string name="nav_settings">Settings</string>
+</resources>

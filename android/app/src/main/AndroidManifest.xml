@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- BLE Mesh Communication Permissions -->
+    <!-- Legacy Bluetooth permissions for Android 11 (API 30) and below -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+
+    <!-- Modern Bluetooth permissions for Android 12 (API 31)+ -->
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"
+        tools:targetApi="s" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_ADVERTISE"
+        tools:targetApi="s" />
+    <uses-permission
+        android:name="android.permission.BLUETOOTH_CONNECT"
+        tools:targetApi="s" />
+
+    <!-- Location permissions (required for BLE beacon discovery on Android 6 to 11) -->
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:maxSdkVersion="30" />
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:maxSdkVersion="30" />
+
+    <!-- Foreground service for continuous decentralized mesh relay -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
+        tools:targetApi="upside_down_cake" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Hardware Features Declaration -->
+    <uses-feature
+        android:name="android.hardware.bluetooth_le"
+        android:required="true" />
+
+    <application
+        android:name=".HexnetApplication"
+        android:allowBackup="false"
+        android:icon="@android:drawable/sym_def_app_icon"
+        android:label="@string/app_name"
+        android:roundIcon="@android:drawable/sym_def_app_icon"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Hexnet">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Hexnet"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".core.transport.ble.HexnetMeshForegroundService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+    </application>
+
+</manifest>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "inverse-on-surface": "#303030", "outline-variant": "#454652", "on-tertiary": "#342171", "surface-container-high": "#2a2a2a", "secondary-fixed-dim": "#cdbdff", "on-error": "#690005", "on-secondary": "#370294", "on-primary-fixed-variant": "#2d3ba1", "on-primary-container": "#16268f", "primary-fixed-dim": "#bcc2ff", "inverse-surface": "#e2e2e2", "surface-bright": "#393939", "on-tertiary-fixed": "#1e035c", "surface-container-lowest": "#0e0e0e", "on-secondary-fixed": "#20005f", "on-tertiary-fixed-variant": "#4a3989", "primary-fixed": "#dfe0ff", "on-secondary-fixed-variant": "#4e2baa", "on-surface": "#e2e2e2", "surface-dim": "#131313", "tertiary-fixed": "#e7deff", "on-surface-variant": "#c6c5d5", "inverse-primary": "#4654ba", "on-secondary-container": "#c0acff", "on-primary": "#0f208b", "surface-variant": "#353535", "primary": "#bcc2ff", "outline": "#908f9e", "surface-container-highest": "#353535", "on-background": "#e2e2e2", "error-container": "#93000a", "primary-container": "#8795ff", "error": "#ffb4ab", "tertiary": "#ccbeff", "surface-container": "#1f1f1f", "secondary": "#cdbdff", "surface-tint": "#bcc2ff", "surface-container-low": "#1b1b1b", "tertiary-container": "#a391e7", "background": "#131313", "secondary-container": "#502ead", "surface": "#131313", "on-error-container": "#ffdad6", "on-tertiary-container": "#382676", "on-primary-fixed": "#000c61", "tertiary-fixed-dim": "#ccbeff", "secondary-fixed": "#e8deff" }, borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, spacing: { "margin": "1rem", "margin-desktop": "2rem", "space-sm": "0.5rem", "space-lg": "1rem", "space-xs": "0.25rem", "space-md": "0.75rem", "margin-mobile": "1rem", "margin-tablet": "1.5rem", "space-xl": "1.5rem", "gutter": "1rem" }, fontFamily: { "body-md": ["JetBrains Mono"], "label-caps": ["JetBrains Mono"], "body-lg": ["JetBrains Mono"], "label-lg": ["JetBrains Mono"], "display-lg": ["JetBrains Mono"], "headline-md": ["JetBrains Mono"], "headline-lg": ["JetBrains Mono"], "title-lg": ["JetBrains Mono"], "title-md": ["JetBrains Mono"], "headline-lg-mobile": ["JetBrains Mono"], "body-sm": ["JetBrains Mono"], "stat-lg": ["JetBrains Mono"] }, fontSize: { "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }], "label-caps": ["11px", { lineHeight: "15px", letterSpacing: "0.06em", fontWeight: "600" }], "body-lg": ["15px", { lineHeight: "22px", letterSpacing: "0em", fontWeight: "400" }], "label-lg": ["13px", { lineHeight: "18px", letterSpacing: "0.02em", fontWeight: "500" }], "display-lg": ["34px", { lineHeight: "42px", letterSpacing: "-0.02em", fontWeight: "700" }], "headline-md": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }], "headline-lg": ["27px", { lineHeight: "35px", letterSpacing: "-0.015em", fontWeight: "700" }], "title-lg": ["19px", { lineHeight: "26px", letterSpacing: "0em", fontWeight: "600" }], "title-md": ["15px", { lineHeight: "21px", letterSpacing: "0em", fontWeight: "500" }], "headline-lg-mobile": ["24px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "700" }], "body-sm": ["11px", { lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "400" }], "stat-lg": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;background-color:#000000;color:#e2e2e2;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-black font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl"><div class="w-full px-margin-mobile pt-space-xs pb-space-xs flex items-center justify-between font-label-caps text-label-caps text-on-surface-variant select-none"><span>09:41</span><div class="flex items-center gap-space-sm"><span class="flex items-center gap-space-xs"><span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span><span class="font-body-sm text-body-sm text-primary tracking-wider">MESH</span></span><span class="material-symbols-outlined text-[16px]">signal_cellular_alt</span><span class="font-label-caps text-label-caps text-on-surface">98%</span><span class="material-symbols-outlined text-[16px]">battery_charging_full</span></div></div><div class="h-20 px-margin-mobile flex items-center justify-between"><div class="flex flex-col justify-center"><div class="flex items-center gap-space-xs"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span><span class="font-label-caps text-label-caps text-primary tracking-widest uppercase">HEXNET SECURE</span></div><h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight uppercase">Mesh Topology</h1></div><div class="flex items-center gap-space-sm"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full bg-black px-margin-mobile pt-20 pb-28"><div class="flex flex-col w-full gap-space-lg select-none pb-12">
+<!-- Samsung One UI Top Telemetry Banner -->
+<div class="flex flex-col gap-space-xs pt-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<span class="font-label-caps text-label-caps text-primary tracking-widest uppercase">DIAGNOSTICS ENGINE V4.2</span>
+</div>
+<div class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-label-caps text-label-caps">
+        AIR-GAP VERIFIED
+      </div>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant tracking-wider uppercase">MULTI-HOP ROUTING &amp; TELEMETRY</p>
+</div>
+<!-- Live Metrics Row: Bento Strip -->
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Active Nodes -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm relative overflow-hidden group">
+<div class="absolute -right-2 -bottom-2 opacity-10 text-primary">
+<span class="material-symbols-outlined text-[54px]">hub</span>
+</div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ACTIVE NODES</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+</div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-stat-lg text-stat-lg text-primary tracking-tight">7</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">PEERS</span>
+</div>
+<span class="font-body-sm text-body-sm text-primary/70 mt-space-xs">+2 joined 4m ago</span>
+</div>
+<!-- Direct Links -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm relative overflow-hidden">
+<div class="absolute -right-2 -bottom-2 opacity-10 text-primary-container">
+<span class="material-symbols-outlined text-[54px]">settings_ethernet</span>
+</div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant">DIRECT LINKS</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+</div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-stat-lg text-stat-lg text-primary-container tracking-tight">4</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">1-HOP</span>
+</div>
+<span class="font-body-sm text-body-sm text-primary-container/70 mt-space-xs">BLE 2M PHY Active</span>
+</div>
+<!-- Store & Fwd -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm relative overflow-hidden">
+<div class="absolute -right-2 -bottom-2 opacity-10 text-secondary">
+<span class="material-symbols-outlined text-[54px]">swap_calls</span>
+</div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant">STORE &amp; FWD</span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+</div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-title-lg text-title-lg text-secondary font-bold tracking-tight">3 QUEUED</span>
+</div>
+<span class="font-body-sm text-body-sm text-secondary/70 mt-space-xs">92% TTL reserve</span>
+</div>
+<!-- Packet Loss -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm relative overflow-hidden">
+<div class="absolute -right-2 -bottom-2 opacity-10 text-tertiary">
+<span class="material-symbols-outlined text-[54px]">network_ping</span>
+</div>
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-caps text-label-caps text-on-surface-variant">PACKET LOSS</span>
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+</div>
+<div class="flex items-baseline gap-space-xs">
+<span class="font-stat-lg text-stat-lg text-tertiary tracking-tight">0.2%</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">NOMINAL</span>
+</div>
+<span class="font-body-sm text-body-sm text-tertiary/70 mt-space-xs">Noise E2EE secure</span>
+</div>
+</div>
+<!-- Interactive Network Pulse Sparkline SVG -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant">CARRIER FREQUENCY UTILIZATION</span>
+<span class="font-body-sm text-body-sm text-primary">2.440 GHz ISM</span>
+</div>
+<div class="w-full h-12 flex items-center">
+<svg class="w-full h-10 text-primary-container" fill="none" preserveaspectratio="none" viewbox="0 0 320 40">
+<path d="M0,28 L35,26 L70,30 L105,12 L140,24 L175,8 L210,22 L245,16 L280,28 L320,18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75"></path>
+<path d="M0,28 L35,26 L70,30 L105,12 L140,24 L175,8 L210,22 L245,16 L280,28 L320,18 L320,40 L0,40 Z" fill="currentColor" fill-opacity="0.08"></path>
+</svg>
+</div>
+<div class="flex items-center justify-between font-label-caps text-label-caps text-on-surface-variant">
+<span>RSSI: -64 dBm</span>
+<span>FLOOD TX: 14 dBm</span>
+<span>SNR: +22 dB</span>
+</div>
+</div>
+<!-- Known Routing Table Section -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-primary">account_tree</span>
+<h2 class="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">KNOWN ROUTING TABLE</h2>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">3 CONVERGED</span>
+</div>
+<!-- Node 1: Nova (Direct) -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm gap-space-sm transition-transform active:scale-[0.98]">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center relative">
+<span class="material-symbols-outlined text-[20px] text-primary">sensors</span>
+<span class="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-primary"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-on-surface font-semibold truncate">0x8B2F (Nova)</span>
+<span class="font-body-sm text-body-sm text-primary">Next Hop: Direct</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-title-md text-title-md text-primary font-bold">42ms</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">1 HOP</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs font-body-sm text-body-sm bg-surface-container-low px-space-sm py-1 rounded">
+<span class="text-on-surface-variant">PHY LINK</span>
+<span class="text-on-surface font-semibold">BLE LE 2M PHY (Encrypted)</span>
+</div>
+</div>
+<!-- Node 2: Atlas (Relayed) -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm gap-space-sm transition-transform active:scale-[0.98]">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center relative">
+<span class="material-symbols-outlined text-[20px] text-primary-container">alt_route</span>
+<span class="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-on-surface font-semibold truncate">0xE4A1 (Atlas)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Next Hop: 0x14C9</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-title-md text-title-md text-on-surface font-bold">118ms</span>
+<span class="font-label-caps text-label-caps text-primary-container">2 HOPS</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs font-body-sm text-body-sm bg-surface-container-low px-space-sm py-1 rounded">
+<span class="text-on-surface-variant">PHY LINK</span>
+<span class="text-on-surface font-semibold">Multi-hop Relay</span>
+</div>
+</div>
+<!-- Node 3: Echo (Flood) -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm gap-space-sm transition-transform active:scale-[0.98]">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center relative">
+<span class="material-symbols-outlined text-[20px] text-secondary">wifi_tethering</span>
+<span class="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-secondary"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-title-md text-on-surface font-semibold truncate">0x55C8 (Echo)</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Next Hop: 0x8B2F</span>
+</div>
+</div>
+<div class="flex flex-col items-end">
+<span class="font-title-md text-title-md text-on-surface font-bold">240ms</span>
+<span class="font-label-caps text-label-caps text-secondary">3 HOPS</span>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs font-body-sm text-body-sm bg-surface-container-low px-space-sm py-1 rounded">
+<span class="text-on-surface-variant">PHY LINK</span>
+<span class="text-on-surface font-semibold">Flood Routing</span>
+</div>
+</div>
+</div>
+<!-- Queue Status Panel (Translucent Liquid Glass feel via Obsidian Stacking) -->
+<div class="flex flex-col p-space-md rounded bg-surface-container-low shadow-sm gap-space-md relative overflow-hidden">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[18px] text-primary">tune</span>
+<h3 class="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">QUEUE ENGINE STATUS</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-highest text-primary font-label-caps text-label-caps">STORE-FWD ON</span>
+</div>
+<!-- Three-col queue telemetry -->
+<div class="grid grid-cols-3 gap-space-xs text-center">
+<div class="flex flex-col p-space-sm rounded bg-surface-container-lowest">
+<span class="font-label-caps text-label-caps text-on-surface-variant">OUTBOUND</span>
+<span class="font-title-md text-title-md text-primary font-bold mt-1">2 PKTS</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant/70 mt-0.5">Priority High</span>
+</div>
+<div class="flex flex-col p-space-sm rounded bg-surface-container-lowest">
+<span class="font-label-caps text-label-caps text-on-surface-variant">FLOOD BUFF</span>
+<span class="font-title-md text-title-md text-secondary font-bold mt-1">5/64 KB</span>
+<span class="font-body-sm text-body-sm text-secondary/70 mt-0.5">7.8% Load</span>
+</div>
+<div class="flex flex-col p-space-sm rounded bg-surface-container-lowest">
+<span class="font-label-caps text-label-caps text-on-surface-variant">TTL DEFAULT</span>
+<span class="font-title-md text-title-md text-tertiary font-bold mt-1">3 HOPS</span>
+<span class="font-body-sm text-body-sm text-tertiary/70 mt-0.5">Max Horizon</span>
+</div>
+</div>
+<!-- Progress Indicator for Buffer -->
+<div class="flex flex-col gap-1">
+<div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant">
+<span>INBOUND FLOOD CAPACITY</span>
+<span>59 KB FREE</span>
+</div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full bg-primary-container rounded-full" style="width: 8%;"></div>
+</div>
+</div>
+</div>
+<!-- Recent Network Events Log (Monospaced Stream) -->
+<div class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-[16px] text-primary">terminal</span>
+<h2 class="font-label-caps text-label-caps text-on-surface uppercase tracking-wider">EVENT BUS STREAM</h2>
+</div>
+<div class="flex items-center gap-1 font-body-sm text-body-sm text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span>SYNCED</span>
+</div>
+</div>
+<div class="flex flex-col p-space-md rounded bg-surface-container-lowest shadow-sm gap-space-xs overflow-x-auto font-body-sm text-body-sm" id="events-stream">
+<div class="flex items-start gap-space-xs text-on-surface">
+<span class="text-on-surface-variant select-none">[10:43:02]</span>
+<span class="text-primary font-semibold">BLE_ADVERT_RCV:</span>
+<span class="truncate">Peer 0x09F2 payload 31B</span>
+</div>
+<div class="flex items-start gap-space-xs text-on-surface">
+<span class="text-on-surface-variant select-none">[10:42:55]</span>
+<span class="text-primary-container font-semibold">ROUTE_DISCOVERY:</span>
+<span class="truncate">Path to 0xE4A1 refreshed via 0x14C9</span>
+</div>
+<div class="flex items-start gap-space-xs text-on-surface">
+<span class="text-on-surface-variant select-none">[10:42:19]</span>
+<span class="text-tertiary font-semibold">ACK_CONFIRMED:</span>
+<span class="truncate">Packet #8410 delivered (RTT 84ms)</span>
+</div>
+</div>
+</div>
+<!-- Manipulation Zone: Action Buttons (Thumb Optimized) -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<!-- Primary Action Pill -->
+<button class="w-full h-12 rounded-full bg-primary-container text-on-primary-container font-label-lg text-label-lg font-bold flex items-center justify-center gap-space-xs transition-transform active:scale-[0.94] shadow-md" id="ping-btn">
+<span class="material-symbols-outlined text-[20px]">cell_tower</span>
+<span>BROADCAST PING</span>
+</button>
+<!-- Secondary Split Pills -->
+<div class="grid grid-cols-2 gap-space-sm">
+<button class="h-12 rounded-full bg-surface-container-high text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-space-xs transition-transform active:scale-[0.94]" id="clear-btn">
+<span class="material-symbols-outlined text-[18px] text-outline">clear_all</span>
+<span>CLEAR QUEUE</span>
+</button>
+<button class="h-12 rounded-full bg-surface-container-high text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-space-xs transition-transform active:scale-[0.94]" id="export-btn">
+<span class="material-symbols-outlined text-[18px] text-outline">ios_share</span>
+<span>EXPORT LOGS</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  // Tactical micro-interactions for MESH Diagnostics
+  const pingBtn = document.getElementById('ping-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const exportBtn = document.getElementById('export-btn');
+  const eventStream = document.getElementById('events-stream');
+
+  if (pingBtn && eventStream) {
+    pingBtn.addEventListener('click', () => {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      const newEntry = document.createElement('div');
+      newEntry.className = 'flex items-start gap-space-xs text-on-surface opacity-0 transition-opacity duration-300';
+      newEntry.innerHTML = `
+        <span class="text-on-surface-variant select-none">[${timeStr}]</span>
+        <span class="text-primary font-semibold">FLOOD_ECHO:</span>
+        <span class="truncate">Ping broadcast emitted (7 peers target)</span>
+      `;
+      eventStream.prepend(newEntry);
+      requestAnimationFrame(() => {
+        newEntry.classList.remove('opacity-0');
+      });
+    });
+  }
+
+  if (clearBtn && eventStream) {
+    clearBtn.addEventListener('click', () => {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      eventStream.innerHTML = `
+        <div class="flex items-start gap-space-xs text-on-surface">
+          <span class="text-on-surface-variant select-none">[${timeStr}]</span>
+          <span class="text-tertiary font-semibold">QUEUE_PURGE:</span>
+          <span class="truncate">Buffers zeroed. Standing by for telemetry.</span>
+        </div>
+      `;
+    });
+  }
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const originalText = exportBtn.innerHTML;
+      exportBtn.innerHTML = `
+        <span class="material-symbols-outlined text-[18px] text-primary">check_circle</span>
+        <span>COPIED TO MESH</span>
+      `;
+      setTimeout(() => {
+        exportBtn.innerHTML = originalText;
+      }, 1400);
+    });
+  }
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe pointer-events-none" data-active-classes="text-primary-container font-headline-md"><div class="px-margin-mobile pb-space-sm pt-space-xs"><div class="pointer-events-auto h-16 w-full rounded-full bg-[#101014]/85 backdrop-blur-2xl px-space-sm flex items-center justify-around shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] text-on-surface-variant transition-transform active:scale-95" data-path="messages" href="#"><span class="material-symbols-outlined text-[24px]">chat_bubble</span><span class="font-label-caps text-label-caps tracking-wider uppercase">Chat</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] text-on-surface-variant transition-transform active:scale-95" data-path="nearby-radar" href="#"><span class="material-symbols-outlined text-[24px]">radar</span><span class="font-label-caps text-label-caps tracking-wider uppercase">Nearby</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] transition-transform active:scale-95 text-primary-container font-headline-md" data-path="mesh-topology" href="#"><span class="material-symbols-outlined text-[24px]">hub</span><span class="font-label-caps text-label-caps tracking-wider uppercase">Mesh</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[48px] text-on-surface-variant transition-transform active:scale-95" data-path="node-settings" href="#"><span class="material-symbols-outlined text-[24px]">tune</span><span class="font-label-caps text-label-caps tracking-wider uppercase">Config</span></a></div><div class="w-full flex justify-center pt-space-xs pb-space-xs"><div class="w-32 h-1 rounded-full bg-on-surface-variant/40"></div></div></div></nav></body></html>
